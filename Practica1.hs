@@ -12,57 +12,89 @@ regla b = case b of
     True -> "Quedate en Casa"
     False -> "Qudate en Casa"
 
--- b)
-case [x]         =  []
-case (x:y:xs)      =  y : case (x:xs)
-case []          =  []
+-- b)--"case" es una palabra reservada, se cambio a la palabra "caso"--
+caso [] =  []
+caso [x] = []
+caso (x:y:xs) =  y : caso (x:xs)
 
--- c)
-map f []        =  []
-map f (x:xs)     =  f x : map f xs
 
--- d)
-listNumeros = (1 : 2) : 'a' : []
+-- c)--"map" es reservada tambien, entonces se cambio a "map_alt"
+map_alt f []        =  []
+map_alt f (x:xs)     =  f x : map_alt f xs
+
+-- d)--error en el tipo de dato, siendo listNumeros::[int], se arregla colocando un numero
+listNumeros = 1 : 2 : 3 : [] 
 
 -- e)
 []     ++! ys = ys
 (x:xs) ++! ys = x : xs ++! ys
 
--- f)
-addToTail x xs = map +x tail xs
+-- f)-- el operador del map debe estar entre parentesis  y haskell asocia a la izquierda entonces "map (+x) tail xs" = "(map (+x) tail) xs" lo cual da error--
+addToTail x xs = map (+x) (tail xs)
 
--- g)
-listmin xs = head . sort xs
+-- g)--En haskell la aplicacion tiene mayor precedencia que cualquier otro operador--
+-- al hacer "head . sort xs" primero resuelve sort llevando a un error al intentar juntar head con (sort xs)--
+listmin xs = (head.sort) xs
 
 -- h) (*)
 smap f [] = []
 smap f [x] = [f x]
-smap f (x:xs) = f x : smap (smap f) xs
+smap f (x:xs) = f x : smap f xs
 
 {-
-2. Definir las siguientes funciones y determinar su tipo:
+2. Definir las siguientes funciones y determinar su tipo:-}
 
-a) five, que dado cualquier valor, devuelve 5
+--a) five, que dado cualquier valor, devuelve 5
+five :: Num a => p -> a
+five _ = 5
 
-b) apply, que toma una función y un valor, y devuelve el resultado de
-aplicar la función al valor dado
+--b) apply, que toma una función y un valor, y devuelve el resultado de
+--aplicar la función al valor dado
+apply :: (a -> b) -> a -> b
+apply f x = f x 
 
-c) identidad, la función identidad
+--c) identidad, la función identidad
+identidad :: Int -> Int
+identidad x = x
 
-d) first, que toma un par ordenado, y devuelve su primera componente
+--d) first, que toma un par ordenado, y devuelve su primera componente
+first :: (a,b) -> a
+first (x,y) = x
 
-e) derive, que aproxima la derivada de una función dada en un punto dado
+--e) derive, que aproxima la derivada de una función dada en un punto dado
+derive :: Integral a =>(a -> a) -> a -> a
+derive f x = ((f x) - (f 0)) `div` x
 
-f) sign, la función signo
+--f) sign, la función signo
+sign :: Int -> Int
+sign x | (x<0) = -1
+       | (x>0) = 1
+       | otherwise = 0
 
-g) vabs, la función valor absoluto (usando sign y sin usarla)
+{-sign :: Int -> String
+sign x | (x<0) = "Negative"
+       | (x>0) = "Positive"
+       | otherwise = "Zero"-}
 
-h) pot, que toma un entero y un número, y devuelve el resultado de
-elevar el segundo a la potencia dada por el primero
+--g) vabs, la función valor absoluto (usando sign y sin usarla)
+vabswith :: Int -> Int
+vabswithout :: Int -> Int --TIPO DE DATO ORD SIGNIFICA QUE ES UN DATO ORDENABLE , ES DECIR COMPARABLE, SE MENCIONA EN CASO DE PATTERN MACHINE O IF--
+vabswithout x = if x<0 then -x else x
+vabswith x = sign x *x
 
-i) xor, el operador de disyunción exclusiva
+--h) pot, que toma un entero y un número, y devuelve el resultado de
+--elevar el segundo a la potencia dada por el primero
+pot :: Num a => Int -> a -> a --Tuve que poner Num a => porque interpreta como literal a 1
+pot 0 y = 1
+pot x y = y * (pot (x-1) y)
 
-j) max3, que toma tres números enteros y devuelve el máximo entre llos
+--i) xor, el operador de disyunción exclusiva
+xor :: Bool -> Bool -> Bool
+xor x y | (x==y) = False
+        | (x||y) = True
+        | otherwise = False
+
+{-j) max3, que toma tres números enteros y devuelve el máximo entre llos
 
 k) swap, que toma un par y devuelve el par con sus componentes invertidas
 -}
