@@ -94,10 +94,13 @@ xor x y | (x==y) = False
         | (x||y) = True
         | otherwise = False
 
-{-j) max3, que toma tres números enteros y devuelve el máximo entre llos
+--j) max3, que toma tres números enteros y devuelve el máximo entre ellos
+max3 ::Ord a=> a->a->a->a
+max3 x y z = if x>=y && x>=z then x else if y>=x && y>=z then y else z
 
-k) swap, que toma un par y devuelve el par con sus componentes invertidas
--}
+--k) swap, que toma un par y devuelve el par con sus componentes invertidas
+swap::(a,b) -> (b,a)
+swap (x,y) = (y,x)
 
 {-
 3) Definir una función que determine si un año es bisiesto o no, de
@@ -109,6 +112,11 @@ de cuatro. (Diccionario de la Real Academia Espaola, 22ª ed.)
 
 ¿Cuál es el tipo de la función definida?
 -}
+bisiest :: Int->Bool
+bisiest x = if (x `mod` 4) /= 0 then False 
+                              else if (x `mod` 100) /= 0 then True 
+                                                       else if (x `mod` 400) ==0 then True else False  
+
 
 {-
 4) Dar al menos dos ejemplos de funciones que tengan cada uno de los siguientes tipos:
