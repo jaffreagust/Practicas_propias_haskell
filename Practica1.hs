@@ -1,6 +1,7 @@
 module Practica0 where
 
 import Data.List
+import Data.Char
 
 {-
 1) Los siguientes códigos tienen errores, cargar el archivo 20.Practica.0.hs en el interprete de Haskell
@@ -118,39 +119,98 @@ bisiest x = if (x `mod` 4) /= 0 then False
                                                        else if (x `mod` 400) ==0 then True else False  
 
 
-{-
-4) Dar al menos dos ejemplos de funciones que tengan cada uno de los siguientes tipos:
-a) (Int -> Int) -> Int
-b) Int -> (Int -> Int)
-c) (Int -> Int) -> (Int -> Int)
-d) Int -> Bool
-e) Bool -> (Bool -> Bool)
-f) (Int,Char) -> Bool
-g) (Int,Int) -> Int
-h) Int -> (Int,Int)
-i) a -> Bool
-j) a -> a
--}
+
+--4) Dar al menos dos ejemplos de funciones que tengan cada uno de los siguientes tipos:
+example4b x y = x*y
+example4e (x::Bool) (y::Bool)= x&&y
+example4ee x = case x of
+       True -> False
+       False-> True
+
+--a) (Int -> Int) -> Int
+fun4a :: (Int->Int)->Int
+fun4a f= f 4 
+
+fun4aa :: (Int->Int)->Int
+fun4aa g = 2*(g 3) 
+
+--b) Int -> (Int -> Int)
+fun4b :: Int->(Int->Int)
+fun4b x =  example4b x
+
+fun4bb:: Int->(Int->Int)
+fun4bb y = pot (y+0)
 
 
-{-
-5) Definir las siguientes funciones usando listas por comprensión:
+--c) (Int -> Int) -> (Int -> Int)
+fun4c :: (Int->Int) -> (Int->Int)
+fun4c vabswith = vabswithout
 
-a) 'divisors', que dado un entero positivo 'x' devuelve la
-lista de los divisores de 'x' (o la lista vacía si el entero no es positivo)
+fun4cc :: (Int->Int)->(Int->Int)
+fun4cc pot y = pot 10
 
-b) 'matches', que dados un entero 'x' y una lista de enteros descarta
-de la lista los elementos distintos a 'x'
+--d) Int -> Bool
+fun4d (x::Int) = x>0
 
-c) 'cuadrupla', que dado un entero 'n', devuelve todas las cuadruplas
+fun4dd (x::Int) = x>10 
+--e) Bool -> (Bool -> Bool)
+fun4e (u::Bool) = example4e u
+fun4ee (x::Bool) = example4ee  
+
+--f) (Int,Char) -> Bool
+fun4f (x::Int,y::Char) = x==ord(y)
+fun4ff (x::Int,y::Char) = chr(x)==y
+
+
+--g) (Int,Int) -> Int
+fun4g (x::Int,y::Int) = x+y
+
+fun4gg (x::Int,y::Int) = x-y
+
+--h) Int -> (Int,Int)
+fun4h (x::Int) = (x,x)
+fun4hh (x::Int) = (x,2*x)
+
+
+--i) a -> Bool
+fun4i (x::a) = x>0
+fun4ii (x::a) = mod x 2 == 0
+
+--j) a -> a
+fun4j (x::a) = x
+fun4jj (i::a) = i
+
+
+--5) Definir las siguientes funciones usando listas por comprensión:
+
+{-a) 'divisors', que dado un entero positivo 'x' devuelve la
+lista de los divisores de 'x' (o la lista vacía si el entero no es positivo)-}
+divisors x | (x<0) = []
+           | (x>=0) = [div x y |y<- [1..x], mod x y ==0]
+
+{-b) 'matches', que dados un entero 'x' y una lista de enteros descarta
+de la lista los elementos distintos a 'x'-}
+matches x ys = [y| y<-ys,x==y]
+
+{- c) 'cuadrupla', que dado un entero 'n', devuelve todas las cuadruplas
 '(a,b,c,d)' que satisfacen a^2 + b^2 = c^2 + d^2,
-donde 0 <= a, b, c, d <= 'n'
+donde 0 <= a, b, c, d <= 'n'-}
 
-(d) 'unique', que dada una lista 'xs' de enteros, devuelve la lista
+cuadrupla n = [(a,b,c,d)| a<-[0..n],b<-[0..n],c<-[0..n],d<-[0..n], (pot 2 a)+(pot 2 b) == (pot 2 c)+(pot 2 d)]
+
+
+{-(d) 'unique', que dada una lista 'xs' de enteros, devuelve la lista
 'xs' sin elementos repetidos
 unique :: [Int] -> [Int]
 -}
+--aux toma una lista y un elemento y devuelve True si existe otro elemento despues en la lista
+aux e xs =not ([x|x <-xs , e==x] ==[])
 
+--dropl toma un indice y una lista y retorna todos los elementos siguientes al indice
+dropl n xs = [x|(x,i)<- zip xs [1..],i>n]
+
+--unique toma una lista y retorna todos los elementos tales que no esten despues en la lista (not (aux))
+unique xs = [u | (i,u)<- zip [1..] xs, not(aux u (dropl i xs))]
 
 
 {-
@@ -161,35 +221,60 @@ devuelva el producto escalar de dos listas.
 
 Sugerencia: Usar las funciones 'zip' y 'sum'. -}
 
+
+scalarproduct xs ys = sum [x*y|(i,x)<-zip [1..] xs ,(u,y)<-zip [1..] ys,i==u]
+
+scalarproduct1 [] [] = 0
+scalarproduct1 (x:xs) (y:ys) = x*y+scalarproduct1 xs ys
+
 {-
 7) Sin usar funciones definidas en el
 preludio, defina recursivamente las siguientes funciones y
-determine su tipo más general:
+determine su tipo más general:-}
 
-a) 'suma', que suma todos los elementos de una lista de números
+--a) 'suma', que suma todos los elementos de una lista de números
+suma [] = 0
+suma (x:xs) = x+suma(xs)
 
-b) 'alguno', que devuelve True si algún elemento de una
+{-b) 'alguno', que devuelve True si algún elemento de una
 lista de valores booleanos es True, y False en caso
-contrario
+contrario-}
+alguno [] = False
+alguno (x:xs) = x || alguno xs
 
-c) 'todos', que devuelve True si todos los elementos de
+
+{-c) 'todos', que devuelve True si todos los elementos de
 una lista de valores booleanos son True, y False en caso
-contrario
+contrario -}
+todos [] = True
+todos (x:xs)= x && todos xs
 
-d) 'codes', que dada una lista de caracteres, devuelve la
-lista de sus ordinales
 
-e) 'restos', que calcula la lista de los restos de la
+{-d) 'codes', que dada una lista de caracteres, devuelve la
+lista de sus ordinales-}
+
+
+{-e) 'restos', que calcula la lista de los restos de la
 división de los elementos de una lista de números dada por otro
-número dado
+número dado-}
 
-f) 'cuadrados', que dada una lista de números, devuelva la
-lista de sus cuadrados
+restos x [] = []
+restos x (y:ys) = [mod y x] ++ restos x ys 
 
-g) 'longitudes', que dada una lista de listas, devuelve la
-lista de sus longitudes
+{-f) 'cuadrados', que dada una lista de números, devuelva la
+lista de sus cuadrados-}
+cuadrados [] = []
+cuadrados (x:xs) = [x*x] ++ cuadrados xs
 
-h) 'orden', que dada una lista de pares de números, devuelve
+{-g) 'longitudes', que dada una lista de listas, devuelve la
+lista de sus longitudes-}
+altlenght [] = 0
+altlenght (x:xs) = 1+altlenght xs
+
+longitudes [] = []
+longitudes (xs:xss) = [altlenght xs] ++ longitudes xss 
+
+{-h) 'orden', que dada una lista de pares de números, devuelve
 la lista de aquellos pares en los que la primera componente es
 menor que el triple de la segunda
 
