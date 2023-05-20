@@ -340,13 +340,36 @@ masDe' xss n = filter (\xs->(foldr (+) 0 (map (\x->1) xs)) > n) xss
 Ej: [(3,'a'), (2,'b'), (5,'c'), (3,'d'), (2,'h')]
 collect lista = [(3,['a','d']), (2,['b','h']), (5,['c'])]
 -}
-funcionaux x [] = []
-funcionaux x ((u,y):xs) = if x == u then y : funcionaux x xs 
-                                    else funcionaux x xs
+--Evita las repeticiones de la primera componente
+only1x x [] = []
+only1x x ((u,y):ys) = if x==u then only1x x ys
+                              else (u,y) : only1x x ys
+--Forma la lista con las segundas componentes
+ylist x [] = []
+ylist x ((u,y):xs) = if x == u then y : ylist x xs 
+                                     else ylist x xs
 
+--Funcion final que forma una lista mediante la primera componente y la funcion aplicada a la lista entera,todo eso enlazado a la recursion
 collect [] = []
-collect ((x,y): xs) = (x,funcionaux x ((x,y):xs)) : collect xs
+collect ((x,y): xs) =  (x,ylist x ((x,y):xs)) : collect (only1x x xs)
 
+
+
+--VERSION ALTERNATIVA CON LISTAS POR COMPRENSION
+--Forma la lista de las segundas componentes dado un mismo x
+ylist' x xs = [y | (u,y)<- xs , u == x]
+
+--Muestra aquellos valores cuyo indice sea mayor al de n mediante listas por comprension
+dropcomp n xs = [(x,y)| (i,(x,y))<- zip [1..] xs, i>n]
+
+--False si se encuentra otro valor en la lista, True si es el unico
+isInList n xs = not([(x,y)| (x,y)<- xs , x==n]==[])
+
+collect' [] = []
+collect' xs = [(x,ylist' x xs) | (i,(x,y))<- zip [1..] xs,not(isInList x (dropcomp i xs))]
+
+
+--UNIQUE CON RECURSION
 funaux1 x [] = []
 funaux1 x (y:ys) = if y==x then funaux1 x ys
                            else y:funaux1 x ys
