@@ -1,5 +1,3 @@
-module Practica0 where
-
 import Data.List
 import Data.Char
 
@@ -203,6 +201,7 @@ cuadrupla n = [(a,b,c,d)| a<-[0..n],b<-[0..n],c<-[0..n],d<-[0..n], (pot 2 a)+(po
 'xs' sin elementos repetidos
 unique :: [Int] -> [Int]
 -}
+
 --aux toma una lista y un elemento y devuelve True si existe otro elemento despues en la lista
 aux e xs =not ([x|x <-xs , e==x] ==[])
 
@@ -238,7 +237,7 @@ suma (x:xs) = x+suma(xs)
 
 {-b) 'alguno', que devuelve True si algún elemento de una
 lista de valores booleanos es True, y False en caso
-contrario-}
+contrario -}
 alguno [] = False
 alguno (x:xs) = x || alguno xs
 
@@ -251,7 +250,16 @@ todos (x:xs)= x && todos xs
 
 
 {-d) 'codes', que dada una lista de caracteres, devuelve la
-lista de sus ordinales-}
+lista de sus ordinales (posicion en el abecedario)-}
+
+code x [] = error "el caracter no pertenece al orden"
+code x (c:cs) | c==x = 1
+              | otherwise = 1 + code x cs
+
+code' x = code x (['A'..'N']++['Ñ']++['O'..'Z']++['a'..'n']++['ñ']++['o'..'z'])
+
+codes "" = []
+codes (c:cs) = code' c : codes cs
 
 
 {-e) 'restos', que calcula la lista de los restos de la
@@ -276,19 +284,100 @@ longitudes (xs:xss) = [altlenght xs] ++ longitudes xss
 
 {-h) 'orden', que dada una lista de pares de números, devuelve
 la lista de aquellos pares en los que la primera componente es
-menor que el triple de la segunda
+menor que el triple de la segunda-}
+orden [] = []
+orden ((x,y):xs) = if x < 3*y then (x,y) : orden xs  
+                              else orden xs 
 
-i) 'pares', que dada una lista de enteros, devuelve la lista
-de los elementos pares
+-- alternativamente puedo hacer [(x,y)] ++ orden xs
 
-j) 'letras', que dada una lista de caracteres, devuelve la
-lista de aquellos que son letras (minúsculas o mayúsculas)
+{-i) 'pares', que dada una lista de enteros, devuelve la lista
+de los elementos pares-}
+pares [] = []
+pares (x:xs)= if mod x 2 == 0 then x : pares xs 
+                              else pares xs 
 
-k) 'masDe', que dada una lista de listas 'xss' y un
+{-j) 'letras', que dada una lista de caracteres, devuelve la
+lista de aquellos que son letras (minúsculas o mayúsculas)-}
+letras [] = []
+letras (x:xs) = if x >='A' && x <='Z' || x>='a' && x <='z' then x : letras xs 
+                                                           else letras xs
+
+{-k) 'masDe', que dada una lista de listas 'xss' y un
 número 'n', devuelve la lista de aquellas listas de 'xss'
 con longitud mayor que 'n' -}
+
+altlenght1 [] = 0
+altlenght1 (x:xs) = 1+ altlenght1 xs
+
+masDe [] n = []
+masDe (xs:xss) n = if (altlenght1 xs) > n then xs : masDe xss n
+                                         else masDe xss n
 
 {-
 8) Redefinir las funciones del ejercicio anterior usando foldr, map y filter.
 ver su definición en https://hoogle.haskell.org/
 -}
+
+position x = [y | (y,z)<- zip [0..] (['A'..'N']++['Ñ']++['O'..'Z']++['a'..'n']++['ñ']++['o'..'z']) , x == z]
+
+foldrsuma x = foldr (+) 0 x
+foldralguno x = foldr (||) False x
+foldrtodos x = foldr (&&) True x
+code'' x =foldrsuma (map (\x->1) (filter (\y-> position y <= position x) (['A'..'N']++['Ñ']++['O'..'Z']++['a'..'n']++['ñ']++['o'..'z'])))
+codes' x = map code'' x
+maprestos n xs = map (\x -> mod x n) xs
+mapcuadrados xs = map (\x -> x*x) xs
+longitudes' xss = map (\xs->foldr (+) 0 (map (\x->1) xs)) xss 
+filtorden xs = filter (\(x,y) -> x< 3*y) xs
+filtpares xs = filter (\x -> mod x 2 == 0) xs
+filtletras xs = filter (\x->  x >='A' && x <='Z' || x>='a' && x <='z') xs
+masDe' xss n = filter (\xs->(foldr (+) 0 (map (\x->1) xs)) > n) xss
+
+{-
+9) Definir una funcion collect que dada una lista de tuplas clave-valor retorne una lista de tuplas donde el primer valor de la tupla sea la clave y el segundo sea la lista de valores asociados a la clave
+
+Ej: [(3,'a'), (2,'b'), (5,'c'), (3,'d'), (2,'h')]
+collect lista = [(3,['a','d']), (2,['b','h']), (5,['c'])]
+-}
+--Evita las repeticiones de la primera componente
+only1x x [] = []
+only1x x ((u,y):ys) = if x==u then only1x x ys
+                              else (u,y) : only1x x ys
+--Forma la lista con las segundas componentes
+ylist x [] = []
+ylist x ((u,y):xs) = if x == u then y : ylist x xs 
+                                     else ylist x xs
+
+--Funcion final que forma una lista mediante la primera componente y la funcion aplicada a la lista entera,todo eso enlazado a la recursion
+collect [] = []
+collect ((x,y): xs) =  (x,ylist x ((x,y):xs)) : collect (only1x x xs)
+
+
+
+--VERSION ALTERNATIVA CON LISTAS POR COMPRENSION
+--Forma la lista de las segundas componentes dado un mismo x
+ylist' x xs = [y | (u,y)<- xs , u == x]
+
+--Muestra aquellos valores cuyo indice sea mayor al de n mediante listas por comprension
+dropcomp n xs = [(x,y)| (i,(x,y))<- zip [1..] xs, i>n]
+
+--False si se encuentra otro valor en la lista, True si es el unico
+isInList n xs = not([(x,y)| (x,y)<- xs , x==n]==[])
+
+collect' [] = []
+collect' xs = [(x,ylist' x xs) | (i,(x,y))<- zip [1..] xs,not(isInList x (dropcomp i xs))]
+
+
+--UNIQUE CON RECURSION
+funaux1 x [] = []
+funaux1 x (y:ys) = if y==x then funaux1 x ys
+                           else y:funaux1 x ys
+
+unique' [] = []
+unique' (x:xs) = x:(funaux1 x (unique' xs))
+
+{-
+10) Definir map usando foldr 
+-}
+foldrmap f xs= foldr (\x xs->(f x):xs) [] xs
