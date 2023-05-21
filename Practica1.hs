@@ -33,6 +33,7 @@ addToTail x xs = map (+x) (tail xs)
 
 -- g)--En haskell la aplicacion tiene mayor precedencia que cualquier otro operador--
 -- al hacer "head . sort xs" primero resuelve sort llevando a un error al intentar juntar head con (sort xs)--
+--NOTA EL PUNTO (.) ES UN OPERADOR INFIJO QUE TOMA COMO PARAMETRO DOS FUNCIONES, AL RESOLVERSE UNA FALLA
 listmin xs = (head.sort) xs
 
 -- h) (*)
