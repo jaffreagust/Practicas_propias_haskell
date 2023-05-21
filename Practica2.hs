@@ -114,3 +114,87 @@ reverseCL (Consnoc x xs y) = (Consnoc y (reverseCL xs) x)
 --Ejercicio 3e--
 
 --EJERCICIO 4--
+data Aexp= Num Int| Prod Aexp Aexp | Div Aexp Aexp deriving Show
+
+eval:: Aexp->Int
+eval (Prod  (Num x) (Num y) ) = x*y
+eval (Div (Num x) (Num 0)) = error "No se puede dividir por cero"
+eval (Div (Num x) (Num y)) = div x y
+
+
+seval:: Aexp-> Maybe Int
+
+seval (Prod  (Num x) (Num y) ) =Just (x*y)
+seval (Div (Num x) (Num 0)) = Nothing
+seval (Div (Num x) (Num y)) =Just (div x y)
+
+data BST a = E | N (BST a)  a  (BST a) deriving Show
+data Tree a = Empty | Nodo (Tree a) a (Tree a) deriving Show
+data RBT a = Em| R a | B a
+
+maximun::BST a -> a
+
+maximun (N izq x E) = x
+maximun (N izq x der) = maximun der
+
+minimun :: BST a -> a
+minimun (N E x der) = x
+minimun (N izq x der) = minimun izq
+
+checkBST (E) = True 
+checkBST (N E x E) = True
+checkBST (N E x r) = (minimun r) >= x && checkBST r
+checkBST (N l x E) = (maximun l) <=x && checkBST l
+checkBST (N l x r) =  (maximun l) <= x && checkBST l && (minimun r) >= x && checkBST r
+
+
+completo:: a->Int -> Tree a
+
+completo (x::a) 0 = Empty
+--Aca ↓ la recursion doble hace que consuma mucha mas memoria, por lo tanto el sharing es malo
+--completo a x = N (completo a (x-1))  (completo a (x-1)) 
+
+--Aca↓ hay menos recursiones ya que se completa directamente una vez y posteriormente se reemplaza por su valor
+--Consumiendo menos memoria, haciendo menos recursiones y maximizando el sharing
+completo x d = let n = (completo x (d-1))
+                   in Nodo n x n
+
+
+balanceado :: a->Int -> Tree a
+balanceado x 0 = Empty
+balanceado x n |  even(n-1) = let m = div (n-1) 2
+                                  u = balanceado x m
+                                  in Nodo u x u
+               
+               | otherwise = let m = div (n-1) 2 
+                                 (t1,t2) = balanceado' x m
+                                 in Nodo t1 x t2
+                                    where balanceado' x m = (balanceado x (m+1), balanceado x m)
+
+
+member :: Ord a =>BST a -> a ->a -> Bool
+
+member E x aux = (x == aux)
+member (N l b r) x aux | (x>b) = member r x aux
+                       | otherwise = member l x b
+
+
+
+fromOrdListBST :: [a] -> BST a
+{-elementos impares:
+
+raiz: mitad de la lista (x!!div (length x) 2)
+mitad inferior de la lista = take (div (length x) 2) x
+mitad superior de la lista = drop (div ((length x) +1) 2) x
+
+-}
+
+fromOrdListBST []= E 
+fromOrdListBST xs = let l = length xs
+                        u = div l 2
+                        m = xs!!u
+                        zs = take u xs
+                        ys = drop (u+1) xs
+                        (t1,t2) = (fromOrdListBST zs, fromOrdListBST ys)
+                        in   N t1 m t2
+
