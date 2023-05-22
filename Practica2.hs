@@ -41,7 +41,7 @@ moverIni (Linea a pos) = (Linea a 0)
 moverFin (Linea a pos) = (Linea a (length a))
 
 --Insertar v1--
-f (char::Char) a pos= (take pos a) ++ [char] ++ (drop pos a)
+f char a pos= (take pos a) ++ [char] ++ (drop pos a)
 insertarv1 char (Linea a pos) = (Linea (f char a pos) (pos+1))
 
 --Insertar v2--
@@ -131,8 +131,7 @@ seval (Div (Num x) (Num y)) =Just (div x y)
 data BST a = E | N (BST a)  a  (BST a) deriving Show
 data Tree a = Empty | Nodo (Tree a) a (Tree a) deriving Show
 
-data Colors = R|B deriving Show
-data RBT a = Em|T Colors (RBT a) a (RBT a) deriving Show
+
 
 maximun::BST a -> a
 
@@ -152,7 +151,7 @@ checkBST (N l x r) =  (maximun l) <= x && checkBST l && (minimun r) >= x && chec
 
 completo:: a->Int -> Tree a
 
-completo (x::a) 0 = Empty
+completo x 0 = Empty
 --Aca ↓ la recursion doble hace que consuma mucha mas memoria, por lo tanto el sharing es malo
 --completo a x = N (completo a (x-1))  (completo a (x-1)) 
 
@@ -200,4 +199,79 @@ fromOrdListBST xs = let l = length xs
                         (t1,t2) = (fromOrdListBST zs, fromOrdListBST ys)
                         in   N t1 m t2
 
+data Colors = R|B deriving Show
+data RBT a = Em|T Colors (RBT a) a (RBT a) deriving Show
+
+--EJERCICIO 8--
+
+eq R R = True
+eq B B = True
+eq _ _ = False
+--if ((truncate(logBase 2 (fromIntegral l)) `mod` 2) /= 0)
+
+fromOrdListRBT xs = if ((truncate(logBase 2 (fromIntegral (length xs))) `mod` 2) /= 0) then fromOrdListRBT' R xs
+                                                                                       else fromOrdListRBT' B xs
+
+
+fromOrdListRBT' _ [] = Em
+fromOrdListRBT' c xs = let l = length xs
+                           u = div l 2
+                           m = xs!!u
+                           zs = take u xs
+                           ys = drop (u+1) xs
+                           (t1,t2) = (fromOrdListRBT' B zs, fromOrdListRBT' B ys)
+                           (t3,t4) = (fromOrdListRBT' R zs, fromOrdListRBT' R ys)
+                           in  if (eq c R) then T B t1 m t2
+                                           else T R t3 m t4
+
+--EJERCICIO 9 --
+
+
+
+
+type Rank = Int
+data Heap a = Emp | Nod Rank a (Heap a){-L-} (Heap a){-R-} deriving Show -- Rank = Dato a guardar 
+
+
+--Fusion entre dos Leftist Heap--
+merge :: Ord a => Heap a -> Heap a -> Heap a
+merge h1 Emp = h1
+merge Emp h2 = h2
+merge h1@(Nod _ x a1 b1) h2@(Nod _ y a2 b2) =
+    if x <= y then makeH x a1 (merge b1 h2)
+              else makeH y a2 (merge h1 b2)
+
+--Extrae el rango
+rank :: Heap a -> Rank
+rank Emp = 0
+rank (Nod r _ _ _) = r
+
+--Consulta el rango de los dos nodos
+-- Si es mas grande el rango de b se incrementa en uno por la raiz añadida
+-- el mas grande pasara a ser la espina izquierda (se menciona primero), y la menor será la derecha
+makeH x a b = if rank a >= rank b then Nod (rank b + 1) x a b
+                                  else Nod (rank a + 1) x b a
+
+
+
+insert :: Ord a => a -> Heap a -> Heap a
+insert x h = merge (Nod 1 x Emp Emp) h
+
+findMin :: Ord a => Heap a -> a
+findMin (Nod _ x a b) = x
+
+deleteMin :: Ord a => Heap a -> Heap a
+deleteMin (Nod _ x a b) = merge a b
+
+
+--EJERCICIO 10--
+fromList [] = Emp
+fromList zs = let hs = map (\x -> Nod 1 x Emp Emp) zs
+                  pares []= []
+                  pares [x] = [x]
+                  pares (x:y:xs) = merge x y : pares xs
+                  g [] = Emp
+                  g [h] = h
+                  g ys = g(pares ys) 
+                  in g hs
 
