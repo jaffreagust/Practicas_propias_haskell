@@ -200,3 +200,4 @@ fromOrdListBST xs = let l = length xs
                         (t1,t2) = (fromOrdListBST zs, fromOrdListBST ys)
                         in   N t1 m t2
 
+
