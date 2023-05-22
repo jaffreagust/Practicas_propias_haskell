@@ -130,6 +130,7 @@ seval (Div (Num x) (Num y)) =Just (div x y)
 
 data BST a = E | N (BST a)  a  (BST a) deriving Show
 data Tree a = Empty | Nodo (Tree a) a (Tree a) deriving Show
+
 data Colors = R|B deriving Show
 data RBT a = Em|T Colors (RBT a) a (RBT a) deriving Show
 

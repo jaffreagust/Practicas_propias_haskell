@@ -118,11 +118,11 @@ fun3i ((x,y,z)::(a,a,a)) (u::Int) = x
 --EJERCICIO 4--
 
 --a)--
-foo1 p = if p then (p &&) else (p &&)
+--foo1 p = if p then (p &&) else (p &&)
 --Bool->Bool->Bool
 
 --b)--
-foo2 x y z = x (y z )
+--foo2 x y z = x (y z )
 -- (x:: t1->t2) (y:: t3->t1) (z :: t3) ||||| (t1->t2)->(t3->t1)->t3 => t2
 
 --c)--
@@ -130,16 +130,37 @@ foo2 x y z = x (y z )
 -- t1->t2->t3 => t1 t2 t3
 
 --d)--
- foo4 x y z = x y : z
-
+-- foo4 x y z = x y : z
+-- (x::t->a) (y::t) (z ::[a]) |||| (t->a)->t->[a]->[a]
 
 --e)--
- foo5 x y z = x : y z
+-- foo5 x y z = x : y z
+-- (x::a) (y:: t->[a]) (z::t) ||||| a->(t->[a])->t->[a]
 --f)--
- foo6 x y z = x ++ y z
+ --foo6 x y z = x ++ y z
+ --(x:: [a]) (y::b->[a]) (z::b) ||| [a]->(b->[a])->b->[a]
 --g)-- 
-foo7 a b = if b a then head a else [ ]
+--foo7 a b = if b a then head a else [ ]
+--(a::[[t]]) (b::[[t]]->Bool) ||||| [[t]]->([[t]]->Bool)->[t]
 --h)-- 
-foo8 a b = if b a then a else [ ]
+--foo8 a b = if b a then a else [ ]
+--(a::[t]) (b::[t]->Bool) ||| [t]->([t]->Bool)->[t]
 --i)-- 
-foo9 a b = if b a then head (:a) else (:[ ])
+--foo9 a b = if b a then head (:a) else (:[ ])
+--(a::)
+
+
+--EJERCICIO 5--
+
+foldrmap f xs = foldr (\x xs -> f x : xs) [] xs
+
+foldrfilter f xs = foldr (\x xs -> if f x then x: xs else xs) [] xs
+
+
+foldrunzip xs = (foldr (\(z,y) xs-> (z : xs) ) [] xs, foldr (\(z,y) xs-> (y : xs) ) [] xs)
+
+foldrpair2List (a,xs)= foldr (\x xs-> (a,x): xs) [] xs
+
+maxL (x,y) (u,z) = if (abs(x-y)) > (abs(u-z)) then (x,y) else (u,z) 
+foldrmaxSec xs =  foldr (\(x,y) xs -> maxL (x,y) xs ) (0,0) xs 
+ 
