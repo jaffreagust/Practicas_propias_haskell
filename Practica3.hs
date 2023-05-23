@@ -57,7 +57,7 @@ enum (Nodo izq der) = (insertarEnList (L) (enum izq)) ++ (insertarEnList (R) (en
 --EJERCICIO 4--
 
 --4a)--
-data Bin a = E | N (Bin a) a (Bin a) deriving Show
+data Bin a = E | N (Bin a) a (Bin a) deriving (Show,Eq)
 
 cantNodos E d = 0
 cantNodos (N l x r) 0 = 1
@@ -86,14 +86,40 @@ minimun (N izq x der) = minimun izq
 
 sucPredBTS y arb = (minimun(rightBranch(treevalue y arb)), maximun (leftBranch(treevalue y arb)))-}
 
-minimun E z = z
-minimun (N E x r) z = x
-minimun (N l x r) z = minimun l
+minimun E  = 0
+minimun (N E x r)  = x
+minimun (N l x r)  = minimun l 
 
-maximun E z = z
-maximun (N l x R) z = x
-maximun (N l x r) z = maximun r
+maximun E  = 0
+maximun (N l x E)  = x
+maximun (N l x r)  = maximun r 
 
-sucPredBTS y (N l x r) | (x==y) = (maximun l y , minimun r y)
-                       | (x>y) = sucPredBTS y l
-                       | (x<y) = sucPredBTS y r
+
+sucPredBTS' y E z1 z2 = (z1, z2)
+sucPredBTS' y (N l x r) z1 z2 | (x==y) = (maximun l , minimun r)
+                             | (x>y) = sucPredBTS' y l z1 x
+                             | (x<y) = sucPredBTS' y r x z2
+
+sucPredBTS y arb = sucPredBTS' y arb 0 0
+
+--d)--
+type Rank = Int
+data Heap a = Em | Nod Rank a (Heap a){-L-} (Heap a){-R-} deriving Show -- Rank = Dato a guardar 
+
+
+orden [] = []
+orden (x:xs) = [u| u<- orden xs , u<=x] ++ [x] ++ [i | i<- orden xs, i>x]
+
+inorden Em = []
+inorden (Nod _ x l r) = inorden l ++ [x] ++ inorden r 
+
+ordLeftist arb = orden(inorden (arb)) 
+
+--e)--
+checkLHeap Em = True
+checkLHeap (Nod _ x Em Em) = True
+checkLHeap (Nod _ x l@(Nod _ y _ _) Em) = (x<y) && checkLHeap l
+checkLHeap (Nod _ x Em  r@(Nod _ y _ _)) = (x<y) && checkLHeap r
+checkLHeap (Nod _ x l@(Nod r1 y _ _) r@(Nod r2 z _ _)) = (x < y) && (x < z) && checkLHeap l && checkLHeap r && r1 >= r2
+
+--f)--
