@@ -123,3 +123,20 @@ checkLHeap (Nod _ x Em  r@(Nod _ y _ _)) = (x<y) && checkLHeap r
 checkLHeap (Nod _ x l@(Nod r1 y _ _) r@(Nod r2 z _ _)) = (x < y) && (x < z) && checkLHeap l && checkLHeap r && r1 >= r2
 
 --f)--
+
+--g)--
+data Color = Re | B deriving Show
+data RBT a= Emp | T Color (RBT a) a (RBT a) deriving Show --E = empty T = Nodo--
+
+altB Emp = 0
+altB (T B l _ r) = min (1 + altB l) (1 + altB r )
+altB (T Re l _ r) = min (altB l) (altB r )
+
+checkRBT Emp = True
+checkRBT (T _ Emp x r) = checkRBT r
+checkRBT (T _ l x Emp) = checkRBT l
+checkRBT (T Re (T Re _ y _) x _ ) = False
+checkRBT (T Re _ x (T Re _ y _) ) = False
+checkRBT (T _ l x r) = altB l == altB r && checkRBT l && checkRBT r
+
+
