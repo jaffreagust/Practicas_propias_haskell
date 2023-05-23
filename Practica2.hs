@@ -208,7 +208,7 @@ eq R R = True
 eq B B = True
 eq _ _ = False
 --if ((truncate(logBase 2 (fromIntegral l)) `mod` 2) /= 0)
-
+--Anotacion : hacer un makeblack
 fromOrdListRBT xs = if ((truncate(logBase 2 (fromIntegral (length xs))) `mod` 2) /= 0) then fromOrdListRBT' R xs
                                                                                        else fromOrdListRBT' B xs
 
