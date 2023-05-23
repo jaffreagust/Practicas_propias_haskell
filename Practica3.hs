@@ -70,7 +70,7 @@ altura h (N l x r) = altura (h+1) l ++ altura (h+1) r
 checkBalanceBTS (N l x r) =( minimum (altura 0 (N l x r)) +1) >= maximum (altura 0 (N l x r))
 
 --4c)--
-treevalue y (N l x r) | (x==y) = (N l y r)
+{-treevalue y (N l x r) | (x==y) = (N l y r)
                       | (x<y) = treevalue y r 
                       | (x>y) = treevalue y l 
 
@@ -84,4 +84,16 @@ maximun (N izq x der) = maximun der
 minimun (N E x der) = x
 minimun (N izq x der) = minimun izq
 
-sucPredBTS y arb = (minimun(rightBranch(treevalue y arb)), maximun (leftBranch(treevalue y arb)))
+sucPredBTS y arb = (minimun(rightBranch(treevalue y arb)), maximun (leftBranch(treevalue y arb)))-}
+
+minimun E z = z
+minimun (N E x r) z = x
+minimun (N l x r) z = minimun l
+
+maximun E z = z
+maximun (N l x R) z = x
+maximun (N l x r) z = maximun r
+
+sucPredBTS y (N l x r) | (x==y) = (maximun l y , minimun r y)
+                       | (x>y) = sucPredBTS y l
+                       | (x<y) = sucPredBTS y r
