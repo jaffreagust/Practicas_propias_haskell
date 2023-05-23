@@ -1,7 +1,7 @@
 import Data.List
 --EJERCICIO 1
 
---Sin record
+--Sin record--
 data Color = RGB Int Int Int deriving Show
 
 mezclar (RGB x y z) (RGB x1 y1 z1) = (RGB (div (x+x1) 2) (div (y+y1) 2) (div (z+z1) 2) ) 
