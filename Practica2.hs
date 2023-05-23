@@ -226,6 +226,32 @@ fromOrdListRBT' c xs = let l = length xs
 
 --EJERCICIO 9 --
 
+--Inserta dato en una hoja, si esta repetido no lo inserta--
+{-Factos
+*El nodo se inserta como rojo para no romper la invariante global(2)
+-}
+insertRBT :: Ord a => a -> RBT a -> RBT a
+insertRBT x t = makeBlack (ins x t)
+    where ins x Em = T R Em x Em
+          ins x (T c l y r) | x < y = balance c (ins x l) y r
+                            | x > y = balance c l y (ins x r)
+                            | otherwise = T c l y r
+
+--Peruanizador--
+makeBlack Em = Em
+makeBlack (T _ l x r) = T B l x r
+
+
+
+--Toma las 3 componentes de un arbol y retorna un arbol--
+
+balance :: Colors -> RBT a -> a -> RBT a -> RBT a
+balance B (T R (T R a x b) y c) z d = T R (T B a x b) y (T B c z d)
+balance B (T R a x (T R b y c)) z d = T R (T B a x b) y (T B c z d)
+balance B a x (T R (T R b y c) z d) = T R (T B a x b) y (T B c z d)
+balance B a x (T R b y (T R c z d)) = T R (T B a x b) y (T B c z d)
+balance c l a r = T c l a r
+
 
 
 

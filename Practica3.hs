@@ -25,32 +25,63 @@ nat2Int (Succ(x)) = 1+ nat2Int x
 --EJERCICIO 2--
 
 --2)a)--
-data Arb = E | H Int | N Arb Arb deriving Show
+data Arb = Empty | Hoja Int | Nodo Arb Arb deriving Show
 
 data Cmd = L|R deriving Show
 
---N:: Arb->Arb->Arb
+--Nodo:: Arb->Arb->Arb
 
 --2)b)-- 
 selec :: [Cmd] -> Arb->Arb
 
 selec [] arb = arb
-selec [L] (N l r) = l
-selec [R] (N l r) = r
+selec [L] (Nodo l r) = l
+selec [R] (Nodo l r) = r
 selec (L:xs) arb = selec xs (selec [L] arb)
 selec (R:xs) arb = selec xs (selec [R] arb)
 
 
 
 
---Ejemplo : (N (N (H 3) (H 2)) (H 3))
+--Ejemplo : (Nodo (Nodo (Hoja 3) (Hoja 2)) (Hoja 3))
 insertarEnList a [] = []
 insertarEnList a (x:xs) = (a:x):(insertarEnList a xs)
 
 
-enum (E) = [[]]
-enum (H _) = [[]]
-enum (N izq E) = insertarEnList (L) (enum izq)
-enum (N E der) = insertarEnList (R) (enum der)
-enum (N izq der) = (insertarEnList (L) (enum izq)) ++ (insertarEnList (R) (enum der)) 
+enum (Empty) = [[]]
+enum (Hoja _) = [[]]
+enum (Nodo izq Empty) = insertarEnList (L) (enum izq)
+enum (Nodo Empty der) = insertarEnList (R) (enum der)
+enum (Nodo izq der) = (insertarEnList (L) (enum izq)) ++ (insertarEnList (R) (enum der)) 
 
+--EJERCICIO 4--
+
+--4a)--
+data Bin a = E | N (Bin a) a (Bin a) deriving Show
+
+cantNodos E d = 0
+cantNodos (N l x r) 0 = 1
+cantNodos (N l x r) d = (cantNodos l (d-1))+ (cantNodos r (d-1))
+
+--4b)
+altura h E = [h]
+altura h (N l x r) = altura (h+1) l ++ altura (h+1) r
+
+checkBalanceBTS (N l x r) =( minimum (altura 0 (N l x r)) +1) >= maximum (altura 0 (N l x r))
+
+--4c)--
+treevalue y (N l x r) | (x==y) = (N l y r)
+                      | (x<y) = treevalue y r 
+                      | (x>y) = treevalue y l 
+
+leftBranch (N l x r) = l
+rightBranch (N l x r) = r
+
+maximun (N izq x E) = x
+maximun (N izq x der) = maximun der
+
+
+minimun (N E x der) = x
+minimun (N izq x der) = minimun izq
+
+sucPredBTS y arb = (minimun(rightBranch(treevalue y arb)), maximun (leftBranch(treevalue y arb)))
