@@ -109,6 +109,16 @@ reverseCL (EmptyCL) = EmptyCL
 reverseCL (CUnit x) = CUnit x
 reverseCL (Consnoc x xs y) = (Consnoc y (reverseCL xs) x)
 
+--Ayuda con listas--
+{-inits [x] = [[],[x]]
+inits xs = inits (borrarU xs) ++ [[xs]]
+
+lasts [x] = [[],[x]]
+lasts xs = lasts (tail xs) ++ [[xss]]
+
+borrarU [] = []
+borrarU [x] = []
+borrarU (x:xs) = x: borrarU xs -}
 --Ejercicio 3c--
 --Ejercicio 3d--
 --Ejercicio 3e--
