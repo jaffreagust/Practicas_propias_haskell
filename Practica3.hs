@@ -54,38 +54,47 @@ enum (Nodo izq Empty) = insertarEnList (L) (enum izq)
 enum (Nodo Empty der) = insertarEnList (R) (enum der)
 enum (Nodo izq der) = (insertarEnList (L) (enum izq)) ++ (insertarEnList (R) (enum der)) 
 
+
+-- EJERCICIO 3--
+type Name = [Char]                        
+data Estado a = Empt | Def Name a (Estado a) deriving Show
+
+--ejemplo Def name1 3(Def name2 4 E)
+initiate = Empt
+
+update n v Empt = Def n v Empt
+update n v (Def m v2 r) | m==n = Def n v r
+                        | otherwise = Def m v2 (update n v r)
+
+lookFor n Empt = Nothing
+lookFor n (Def m v r)  | m==n = Just v
+                       | otherwise = lookFor n r
+
+free n Empt = Empt
+free n (Def m v1 r) | m==n = r
+                    | otherwise = Def m v1 (free n r) 
+
+
+
+
 --EJERCICIO 4--
 
---4a)--
+--4a (BST)--
 data Bin a = E | N (Bin a) a (Bin a) deriving (Show,Eq)
 
 cantNodos E d = 0
 cantNodos (N l x r) 0 = 1
 cantNodos (N l x r) d = (cantNodos l (d-1))+ (cantNodos r (d-1))
 
---4b)
+--4b (BST)
 altura h E = [h]
 altura h (N l x r) = altura (h+1) l ++ altura (h+1) r
 
 checkBalanceBTS (N l x r) =( minimum (altura 0 (N l x r)) +1) >= maximum (altura 0 (N l x r))
 
---4c)--
-{-treevalue y (N l x r) | (x==y) = (N l y r)
-                      | (x<y) = treevalue y r 
-                      | (x>y) = treevalue y l 
-
-leftBranch (N l x r) = l
-rightBranch (N l x r) = r
-
-maximun (N izq x E) = x
-maximun (N izq x der) = maximun der
 
 
-minimun (N E x der) = x
-minimun (N izq x der) = minimun izq
-
-sucPredBTS y arb = (minimun(rightBranch(treevalue y arb)), maximun (leftBranch(treevalue y arb)))-}
-
+--4c) (BST)--
 minimun E  = 0
 minimun (N E x r)  = x
 minimun (N l x r)  = minimun l 
@@ -102,7 +111,10 @@ sucPredBTS' y (N l x r) z1 z2 | (x==y) = (maximun l , minimun r)
 
 sucPredBTS y arb = sucPredBTS' y arb 0 0
 
---d)--
+
+
+
+--4d (LEFTIST HEAP)--
 type Rank = Int
 data Heap a = Em | Nod Rank a (Heap a){-L-} (Heap a){-R-} deriving Show -- Rank = Dato a guardar 
 
@@ -115,14 +127,20 @@ inorden (Nod _ x l r) = inorden l ++ [x] ++ inorden r
 
 ordLeftist arb = orden(inorden (arb)) 
 
---e)--
+
+
+--4e (LEFTIST HEAP)--
 checkLHeap Em = True
 checkLHeap (Nod _ x Em Em) = True
 checkLHeap (Nod _ x l@(Nod _ y _ _) Em) = (x<y) && checkLHeap l
 checkLHeap (Nod _ x Em  r@(Nod _ y _ _)) = (x<y) && checkLHeap r
 checkLHeap (Nod _ x l@(Nod r1 y _ _) r@(Nod r2 z _ _)) = (x < y) && (x < z) && checkLHeap l && checkLHeap r && r1 >= r2
 
---f)--
+
+
+
+
+--4f (LEFTIST HEAP))--
 --Fusion entre dos Leftist Heap--
 merge :: Ord a => Heap a -> Heap a -> Heap a
 merge h1 Em = h1
@@ -141,6 +159,11 @@ rank (Nod r _ _ _) = r
 -- el mas grande pasara a ser la espina izquierda (se menciona primero), y la menor será la derecha
 makeH x a b = if rank a >= rank b then Nod (rank b + 1) x a b
                                   else Nod (rank a + 1) x b a
+
+
+
+
+--MEDIANTE TRANSFORMACION EN LISTA , EXTRACCION DE REPETIDOS E INSERCION COMO LISTA
 
 fromList [] = Em
 fromList xs = let hs = map (\x -> Nod 1 x Em Em) xs
@@ -161,7 +184,29 @@ unique (x:xs) = x:(onlyonex x (unique xs))
 
 notdupLHeap heap = fromList (unique (inorden heap)) 
 
---g)--
+
+
+
+--MEDIANTE CAMBIO EN LA FUNCION MERGE Y EXTRACCION DE LA RAIZ CON MERGEO RECURSIVO DE LOS NODOS 
+
+--similar a merge, sin embargo si son iguales saca el elemento igual y mergea 
+merge' h1 Em = cleanup h1
+merge' Em h2 = cleanup h2
+merge' h1@(Nod _ x a1 b1) h2@(Nod _ y a2 b2)  | x<y = makeH x a1 (merge' b1 h2)
+                                              | x>y = makeH y a2 (merge' h1 b2)
+                                              | otherwise = merge' (merge' a1 b1) h2
+
+--Separa el x (como un nodo vacio en sus extremos) y aplica el nuevo merge a "a" y "b"
+cleanup (Nod k x a b) = merge' (Nod 1 x Em Em) (merge' a b)
+
+
+
+
+
+
+
+--4g (RBT)--
+
 data Color = Re | B deriving Show
 data RBT a= Emp | T Color (RBT a) a (RBT a) deriving Show --E = empty T = Nodo--
 
