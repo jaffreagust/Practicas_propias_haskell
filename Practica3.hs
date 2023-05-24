@@ -44,15 +44,11 @@ selec (R:xs) arb = selec xs (selec [R] arb)
 
 
 --Ejemplo : (Nodo (Nodo (Hoja 3) (Hoja 2)) (Hoja 3))
-insertarEnList a [] = []
-insertarEnList a (x:xs) = (a:x):(insertarEnList a xs)
-
-
-enum (Empty) = [[]]
-enum (Hoja _) = [[]]
-enum (Nodo izq Empty) = insertarEnList (L) (enum izq)
-enum (Nodo Empty der) = insertarEnList (R) (enum der)
-enum (Nodo izq der) = (insertarEnList (L) (enum izq)) ++ (insertarEnList (R) (enum der)) 
+enum''(E) = [[]]
+enum'' (H _) = [[]]
+enum'' (N izq E) = map (L:) (enum'' izq)
+enum'' (N E der) = map (R:) (enum'' der)
+enum'' (N izq der) = (map (L:) (enum'' izq)) ++ (map (R:) (enum'' der)) 
 
 
 -- EJERCICIO 3--
