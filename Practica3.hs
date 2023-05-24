@@ -44,6 +44,7 @@ selec (R:xs) arb = selec xs (selec [R] arb)
 
 
 --Ejemplo : (Nodo (Nodo (Hoja 3) (Hoja 2)) (Hoja 3))
+--Se utiliza map debido a que el tipo que sale de enum es [[CMD]], mientras que L o R es solo CMD
 enum''(E) = [[]]
 enum'' (H _) = [[]]
 enum'' (N izq E) = map (L:) (enum'' izq)
