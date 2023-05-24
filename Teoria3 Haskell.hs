@@ -72,6 +72,12 @@ balance c l a r = T c l a r
 --Costo LOGARITMICO--
 --no recursivo--
 
+
+
+
+
+
+
 --HEAPS (NO es un Binary Tree Search)--
 
 {-una invariante

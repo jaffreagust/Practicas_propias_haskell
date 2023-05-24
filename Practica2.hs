@@ -128,11 +128,14 @@ seval (Prod  (Num x) (Num y) ) =Just (x*y)
 seval (Div (Num x) (Num 0)) = Nothing
 seval (Div (Num x) (Num y)) =Just (div x y)
 
+
+
+
+
+--EJERCICIO 5--
 data BST a = E | N (BST a)  a  (BST a) deriving Show
-data Tree a = Empty | Nodo (Tree a) a (Tree a) deriving Show
 
-
-
+--a) (BST) --
 maximun::BST a -> a
 
 maximun (N izq x E) = x
@@ -142,6 +145,8 @@ minimun :: BST a -> a
 minimun (N E x der) = x
 minimun (N izq x der) = minimun izq
 
+
+--b) (BST) --
 checkBST (E) = True 
 checkBST (N E x E) = True
 checkBST (N E x r) = (minimun r) >= x && checkBST r
@@ -149,6 +154,13 @@ checkBST (N l x E) = (maximun l) <=x && checkBST l
 checkBST (N l x r) =  (maximun l) <= x && checkBST l && (minimun r) >= x && checkBST r
 
 
+
+--EJERCICIO 6--
+data Tree a = Empty | Nodo (Tree a) a (Tree a) deriving Show
+
+
+
+--a) (BST) --
 completo:: a->Int -> Tree a
 
 completo x 0 = Empty
@@ -161,6 +173,8 @@ completo x d = let n = (completo x (d-1))
                    in Nodo n x n
 
 
+
+--b) (BST)--
 balanceado :: a->Int -> Tree a
 balanceado x 0 = Empty
 balanceado x n |  even(n-1) = let m = div (n-1) 2
@@ -172,6 +186,10 @@ balanceado x n |  even(n-1) = let m = div (n-1) 2
                                  in Nodo t1 x t2
                                     where balanceado' x m = (balanceado x (m+1), balanceado x m)
 
+
+
+
+--EJERCICIO 7 --
 
 member :: Ord a =>BST a -> a ->a -> Bool
 
@@ -199,17 +217,18 @@ fromOrdListBST xs = let l = length xs
                         (t1,t2) = (fromOrdListBST zs, fromOrdListBST ys)
                         in   N t1 m t2
 
+
+
+--EJERCICIO 8 (RBT)--
 data Colors = R|B deriving Show
 data RBT a = Em|T Colors (RBT a) a (RBT a) deriving Show
-
---EJERCICIO 8--
 
 eq R R = True
 eq B B = True
 eq _ _ = False
 --if ((truncate(logBase 2 (fromIntegral l)) `mod` 2) /= 0)
---Anotacion : hacer un makeblack
-fromOrdListRBT xs = if ((truncate(logBase 2 (fromIntegral (length xs))) `mod` 2) /= 0) then fromOrdListRBT' R xs
+--Anotacion : La raiz siempre debe ser negra, esto porque si fuese roja rompería la invariante local (todo nodo rojo DEBE tener un padre negro)
+fromOrdListRBT xs = if ((truncate(logBase 2 (fromIntegral (length xs))) `mod` 2) /= 0) then makeBlack (fromOrdListRBT' R xs)
                                                                                        else fromOrdListRBT' B xs
 
 
@@ -224,7 +243,15 @@ fromOrdListRBT' c xs = let l = length xs
                            in  if (eq c R) then T B t1 m t2
                                            else T R t3 m t4
 
---EJERCICIO 9 --
+
+
+
+
+
+
+--EJERCICIO 9 (RBT lbalance rbalance) --
+
+
 
 --Inserta dato en una hoja, si esta repetido no lo inserta--
 {-Factos
@@ -255,9 +282,14 @@ balance c l a r = T c l a r
 
 
 
+
+
+
+--EJERCICIO 10 (LEFTIST HEAP)--
+
+
 type Rank = Int
 data Heap a = Emp | Nod Rank a (Heap a){-L-} (Heap a){-R-} deriving Show -- Rank = Dato a guardar 
-
 
 --Fusion entre dos Leftist Heap--
 merge :: Ord a => Heap a -> Heap a -> Heap a
@@ -279,18 +311,6 @@ makeH x a b = if rank a >= rank b then Nod (rank b + 1) x a b
                                   else Nod (rank a + 1) x b a
 
 
-
-insert :: Ord a => a -> Heap a -> Heap a
-insert x h = merge (Nod 1 x Emp Emp) h
-
-findMin :: Ord a => Heap a -> a
-findMin (Nod _ x a b) = x
-
-deleteMin :: Ord a => Heap a -> Heap a
-deleteMin (Nod _ x a b) = merge a b
-
-
---EJERCICIO 10--
 fromList [] = Emp
 fromList zs = let hs = map (\x -> Nod 1 x Emp Emp) zs
                   pares []= []
