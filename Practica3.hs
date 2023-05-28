@@ -45,11 +45,11 @@ selec (R:xs) arb = selec xs (selec [R] arb)
 
 --Ejemplo : (Nodo (Nodo (Hoja 3) (Hoja 2)) (Hoja 3))
 --Se utiliza map debido a que el tipo que sale de enum es [[CMD]], mientras que L o R es solo CMD
-enum''(E) = [[]]
-enum'' (H _) = [[]]
-enum'' (N izq E) = map (L:) (enum'' izq)
-enum'' (N E der) = map (R:) (enum'' der)
-enum'' (N izq der) = (map (L:) (enum'' izq)) ++ (map (R:) (enum'' der)) 
+enum''(Empty) = [[]]
+enum'' (Hoja _) = [[]]
+enum'' (Nodo izq Empty) = map (L:) (enum'' izq)
+enum'' (Nodo Empty der) = map (R:) (enum'' der)
+enum'' (Nodo izq der) = (map (L:) (enum'' izq)) ++ (map (R:) (enum'' der)) 
 
 
 -- EJERCICIO 3--
@@ -211,11 +211,34 @@ altB Emp = 0
 altB (T B l _ r) = min (1 + altB l) (1 + altB r )
 altB (T Re l _ r) = min (altB l) (altB r )
 
-checkRBT Emp = True
-checkRBT (T _ Emp x r) = checkRBT r
-checkRBT (T _ l x Emp) = checkRBT l
-checkRBT (T Re (T Re _ y _) x _ ) = False
-checkRBT (T Re _ x (T Re _ y _) ) = False
-checkRBT (T _ l x r) = altB l == altB r && checkRBT l && checkRBT r
+
+--Chequear que el arbol sea BST--
+minimunRBT (T _ Emp x r) = x
+minimunRBT (T _ l x r) = minimunRBT l  
+
+maximunRBT (T _ l x Emp) = x
+maximunRBT (T _ l x r) = maximunRBT r 
+
+
+checkBSTRBT Emp = True
+checkBSTRBT (T _ Emp x Emp) = True
+checkBSTRBT (T _ l x Emp) = (maximunRBT l) <=x && checkBSTRBT l
+checkBSTRBT (T _ Emp x r) = (minimunRBT r) >=x && checkBSTRBT r 
+checkBSTRBT (T _ l x r) = (maximunRBT l) <=x && checkBSTRBT l &&  (minimunRBT r) >=x && checkBSTRBT r 
+
+
+--funcion semidefinitiva, aplica todas las comparaciones necesarias para saber si es RBT y BST
+checkRBT' Emp = True
+checkRBT' (T _ Emp x Emp) = True
+checkRBT' arb@(T _ Emp x r) = checkRBT' r && (checkBSTRBT arb)
+checkRBT' arb@(T _ l x Emp) = checkRBT' l && (checkBSTRBT arb)
+checkRBT' (T Re (T Re _ y _) x _ ) = False
+checkRBT' (T Re _ x (T Re _ y _) ) = False
+checkRBT' arb@(T _ l x r) = altB l == altB r && checkRBT' l && checkRBT' r && (checkBSTRBT arb)
+
+--Funcion definitiva, chequea que el primer nodo sea negro
+checkRBT (T Re _ _ _) = False
+checkRBT arb = checkRBT' arb
+
 
 
