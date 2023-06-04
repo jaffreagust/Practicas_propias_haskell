@@ -61,3 +61,22 @@ rank (Nod r _ _ _) = r
 -- el mas grande pasara a ser la espina izquierda (se menciona primero), y la menor será la derecha
 makeH x a b = if rank a >= rank b then Nod (rank b + 1) x a b
                                   else Nod (rank a + 1) x b a
+
+
+
+--Calcular el numero de nodos en un nivel especifico de un arbol binario
+data BTS a = H | N (BTS a) a (BTS a) deriving (Show)
+numnod _ H = 0
+numnod 0 (N l x r) = 1
+numnod y (N l x r) = numnod (y-1) l + numnod (y-1) r 
+
+numnod' _ H = []
+numnod' 0 (N l x r) = [x]
+numnod' y (N l x r) = numnod' (y-1) l ++ numnod' (y-1) r 
+
+
+alturarb h H = [h] 
+alturarb h (N l x r) = alturarb (h+1) l ++ alturarb (h+1) r 
+
+checkBalanceBTS H = True
+checkBalanceBTS arb@(N l x r) = (minimum (alturarb 0 arb) +1) >= (maximum (alturarb 0 arb))
