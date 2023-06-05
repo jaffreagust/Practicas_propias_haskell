@@ -230,10 +230,10 @@ checkBSTRBT (T _ l x r) = (maximunRBT l) <=x && checkBSTRBT l &&  (minimunRBT r)
 --funcion semidefinitiva, aplica todas las comparaciones necesarias para saber si es RBT y BST
 checkRBT' Emp = True
 checkRBT' (T _ Emp x Emp) = True
-checkRBT' arb@(T _ Emp x r) = checkRBT' r && (checkBSTRBT arb)
-checkRBT' arb@(T _ l x Emp) = checkRBT' l && (checkBSTRBT arb)
 checkRBT' (T Re (T Re _ y _) x _ ) = False
 checkRBT' (T Re _ x (T Re _ y _) ) = False
+checkRBT' arb@(T _ Emp x r) = altB r == 0 && checkRBT' r && (checkBSTRBT arb)
+checkRBT' arb@(T _ l x Emp) = altB l == 0 && checkRBT' l && (checkBSTRBT arb)
 checkRBT' arb@(T _ l x r) = altB l == altB r && checkRBT' l && checkRBT' r && (checkBSTRBT arb)
 
 --Funcion definitiva, chequea que el primer nodo sea negro

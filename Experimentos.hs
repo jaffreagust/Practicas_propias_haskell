@@ -82,23 +82,64 @@ checkBalanceBST H = True
 checkBalanceBST arb@(N l x r) = (minimum (alturarb 0 arb) +1) >= (maximum (alturarb 0 arb))
 
 
-data Color = R|B deriving Show
-data RBT a = E | Nodo Color (RBT a) a (RBT a) deriving Show
+data Color = R|B deriving (Show)
+data RBT a = E | Nodo Color (RBT a) a (RBT a) deriving (Show)
 
-alturRBT h E = [h]
-alturRBT h (Nodo _ l x r) = alturRBT (h+1) l ++ alturRBT (h+1) r 
+eq R R = True
+eq B B = True
+eq _ _ = False
 
-checkBalanceRBT E = True
-checkBalanceRBT arb@(Nodo _ l x r) = (minimum (alturRBT 0 arb ) +1) >= (maximum (alturRBT 0 arb))
+makeBlack E = E 
+makeBlack (Nodo R l x r)  = (Nodo B l x r)
+makeBlack nodo = nodo  
 
---valores: x-y-z , colores: a-b , extremos: h-i-j-k
-inv E = E
-inv (Nodo R l x r) = (Nodo B (inv(l)) x (inv(r)))
-inv (Nodo B l x r) = (Nodo R (inv(l)) x (inv(r)))
+inorderRBT E = []
+inorderRBT (Nodo _ l x r) = inorderRBT l ++ [x] ++ inorderRBT r 
 
-subalanceoRBT (Nodo a (Nodo b (Nodo _ j y k) z i) x E) = (Nodo a (Nodo b (inv(j)) y (inv(k))) z (Nodo b i x E))
-subalanceoRBT (Nodo a (Nodo b i z (Nodo _ j y k)) x E) = (Nodo a (Nodo b i z (inv(j))) y (Nodo b (inv(k)) x E))
-subalanceoRBT (Nodo a E x (Nodo b (Nodo _ j y k) z i)) = (Nodo a (Nodo b E x (inv(j))) y (Nodo b (inv(k)) z i))
-subalanceoRBT (Nodo a E x (Nodo b i z (Nodo _ j y k))) = (Nodo a (Nodo b E x i) z (Nodo b (inv(j)) y (inv(k)) ))
-subalanceoRBT (Nodo c l x r) = (Nodo c l x r)
+fromListRBT [] = E 
+fromListRBT xs = if (truncate(logBase 2 (fromIntegral(length xs))) `mod` 2 == 0) then makeBlack(fromListRBT' B xs)
+                                                                   else fromListRBT' R xs
 
+fromListRBT' _ [] = E 
+fromListRBT' c  xs = let l = length xs 
+                         u = div l 2
+                         m = xs!!u
+                         zs = take u xs
+                         ys = drop (u+1) xs
+                         (t1,t2) =  (fromListRBT' B zs, fromListRBT' B ys)
+                         (t3,t4) =  (fromListRBT' R zs, fromListRBT' R ys)
+                         in if (eq c R) then Nodo B t1 m t2
+                                       else Nodo R t3 m t4 
+
+
+balanceadoRBT arb = fromListRBT (inorderRBT arb)
+
+
+alturaNegra E = 0
+alturaNegra (Nodo B l _ r) = max (1+ alturaNegra l) (1+alturaNegra r)
+alturaNegra (Nodo R l _ r) = max (alturaNegra l) (alturaNegra r)
+
+maximunRBT (Nodo _ l x E ) = x 
+maximunRBT (Nodo _ l x r) = maximunRBT r
+
+minimunRBT (Nodo _ E x r ) = x 
+minimunRBT (Nodo _ l x r) = minimunRBT l
+
+checkBSTRBT E = True
+checkBSTRBT (Nodo _ E x E) = True
+checkBSTRBT (Nodo _ E x r) =  (minimunRBT r) >= x && checkBSTRBT r 
+checkBSTRBT (Nodo _ l x E) = (maximunRBT l) <= x && checkBSTRBT l 
+checkBSTRBT (Nodo _ l x r) = (maximunRBT l) <= x && checkBSTRBT l && (minimunRBT r) >= x && checkBSTRBT r 
+
+checkRBT' E = True
+checkRBT' (Nodo _ E x E) = True
+checkRBT' (Nodo R (Nodo R _ y _) x _ ) = False
+checkRBT' (Nodo R _ x (Nodo R _ y _ )) = False
+checkRBT' arb@(Nodo _ E x r) = alturaNegra r == 0 && (checkBSTRBT arb) && checkRBT' r 
+checkRBT' arb@(Nodo _ l x E) = alturaNegra l == 0 &&(checkBSTRBT arb) && checkRBT' l 
+
+checkRBT' arb@(Nodo _ l x r) = (alturaNegra l == alturaNegra r) && (checkBSTRBT arb) && checkRBT' l && checkRBT' r
+
+
+checkRBT (Nodo R _ _ _) = False
+checkRBT arb = checkRBT' arb
