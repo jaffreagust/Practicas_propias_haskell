@@ -78,5 +78,27 @@ numnod' y (N l x r) = numnod' (y-1) l ++ numnod' (y-1) r
 alturarb h H = [h] 
 alturarb h (N l x r) = alturarb (h+1) l ++ alturarb (h+1) r 
 
-checkBalanceBTS H = True
-checkBalanceBTS arb@(N l x r) = (minimum (alturarb 0 arb) +1) >= (maximum (alturarb 0 arb))
+checkBalanceBST H = True
+checkBalanceBST arb@(N l x r) = (minimum (alturarb 0 arb) +1) >= (maximum (alturarb 0 arb))
+
+
+data Color = R|B deriving Show
+data RBT a = E | Nodo Color (RBT a) a (RBT a) deriving Show
+
+alturRBT h E = [h]
+alturRBT h (Nodo _ l x r) = alturRBT (h+1) l ++ alturRBT (h+1) r 
+
+checkBalanceRBT E = True
+checkBalanceRBT arb@(Nodo _ l x r) = (minimum (alturRBT 0 arb ) +1) >= (maximum (alturRBT 0 arb))
+
+--valores: x-y-z , colores: a-b , extremos: h-i-j-k
+inv E = E
+inv (Nodo R l x r) = (Nodo B (inv(l)) x (inv(r)))
+inv (Nodo B l x r) = (Nodo R (inv(l)) x (inv(r)))
+
+subalanceoRBT (Nodo a (Nodo b (Nodo _ j y k) z i) x E) = (Nodo a (Nodo b (inv(j)) y (inv(k))) z (Nodo b i x E))
+subalanceoRBT (Nodo a (Nodo b i z (Nodo _ j y k)) x E) = (Nodo a (Nodo b i z (inv(j))) y (Nodo b (inv(k)) x E))
+subalanceoRBT (Nodo a E x (Nodo b (Nodo _ j y k) z i)) = (Nodo a (Nodo b E x (inv(j))) y (Nodo b (inv(k)) z i))
+subalanceoRBT (Nodo a E x (Nodo b i z (Nodo _ j y k))) = (Nodo a (Nodo b E x i) z (Nodo b (inv(j)) y (inv(k)) ))
+subalanceoRBT (Nodo c l x r) = (Nodo c l x r)
+
