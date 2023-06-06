@@ -1,26 +1,5 @@
 import Data.List 
-
-serie xs = [take i xs| i<- [0..length xs]]
-
-borrarUltimo (x:[]) = []
-borrarUltimo (x:xs) = x:borrarUltimo xs
-
-serie' [] = [[]]
-serie' xs = serie' (borrarUltimo xs) ++ [xs]
-
-
-ror xs 0 = xs
-ror (x:xs) n =ror (xs++[x]) (n-1)
-
-
-upto n m | n>m = []
-         | n<=m = n: upto (n+1) m
-
-
-euler n = sum [x | x<- [0..n-1] , x `mod` 3 == 0 || x `mod` 5 == 0]
-
-repn n = [(\x -> n) x| x<- [1..n] ]
-expandir xs = [y | x<- xs, y<- repn x]
+import Data.Char
 
 type Rank = Int
 data Heap a= Em| Nod Rank a (Heap a) (Heap a) deriving (Show)
@@ -143,3 +122,82 @@ checkRBT' arb@(Nodo _ l x r) = (alturaNegra l == alturaNegra r) && (checkBSTRBT 
 
 checkRBT (Nodo R _ _ _) = False
 checkRBT arb = checkRBT' arb
+
+
+borrarUltimo []  = []
+borrarUltimo [x] = []
+borrarUltimo (x:xs) = x: borrarUltimo xs
+
+ylist  x [] = []
+ylist  x ((z,y):ys) = if x == z then y: ylist x ys
+                                else ylist x ys
+
+
+onlyone x [] = []
+onlyone x ((z,y):ys) = if x == z then  onlyone x ys
+                                 else (z,y) : onlyone x ys
+
+collect [] = []
+collect ((x,y):xs) = (x, ylist x ((x,y):xs)) : collect(onlyone x xs)
+
+
+serie [] = [[]]
+serie xs = serie(borrarUltimo xs) ++ [xs]
+
+
+
+paresIguales [] = True
+paresIguales (x:xs) | ((length (delete x xs)) `mod` 2 /= 0) = False
+                    | otherwise = paresIguales (delete x xs)
+
+
+ror xs 0 = xs
+ror (x:xs) n = ror (xs++[x]) (n-1)
+
+upto n m | n==m = [m]
+         | otherwise = n: upto (n+1) m
+
+eco' 0 x = []
+eco' n x = [x] ++ eco' (n-1) x
+
+eco'' n [] = []
+eco'' n (x:xs) = (eco' n x) ++ eco'' (n+1) xs
+
+eco xs = eco'' 1 xs
+
+
+cambios xs = [u| (x,y) <- zip [0..] xs , (u,v) <- zip [0..] xs, u==x-1 && v /= y]
+
+oblongoNum = [x*(x+1)| x<- [1..]]
+
+repetir n x = [x| y<- [1..n]]
+
+ecoprime xs = foldr (++) []  [repetir y x| (x,y) <- zip xs [1..] ]
+
+
+abundantes = [x | x<- [1..] , x< (divisores x)]
+divisores x = foldr (+) 0 [y | y<- [1..x-1], x `mod` y == 0]
+
+euler n = sum([x | x <- [1..n-1] , x `mod` 3 == 0 || x `mod` 5 == 0])
+
+expandir xs = foldr (++) [] [repeater x | x <- xs]
+repeater x = [ x | y<- [0..x-1]]
+
+
+--Ej 3  1.1--
+funa x y = (True &&)
+funb True  = (3>)
+func c = chr(ord(c)+1)
+fund x f = if f x then [x,x,x]
+                    else [1,2,3]
+
+
+fune (x:xs) f =  reverse (f x)
+
+funf ((y:xs):xss) g = if (g y) then xs else []
+
+
+fung (a,b,c) = True
+funh (a,b,c ) x =  if x +10 == 20 then c else c
+funi (a,b,c) x = if a==b && b == c && sum(x,10) > 10 then a else b
+            
