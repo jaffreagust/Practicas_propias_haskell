@@ -88,8 +88,8 @@ balanceadoRBT arb = fromListRBT (inorderRBT arb)
 
 
 alturaNegra E = 0
-alturaNegra (Nodo B l _ r) = max (1+ alturaNegra l) (1+alturaNegra r)
-alturaNegra (Nodo R l _ r) = max (alturaNegra l) (alturaNegra r)
+alturaNegra (Nodo B l _ r) = min (1+ alturaNegra l) (1+alturaNegra r)
+alturaNegra (Nodo R l _ r) = min (alturaNegra l) (alturaNegra r)
 
 maximunRBT (Nodo _ l x E ) = x 
 maximunRBT (Nodo _ l x r) = maximunRBT r
