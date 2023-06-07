@@ -238,7 +238,7 @@ eq B B = True
 eq _ _ = False
 --if ((truncate(logBase 2 (fromIntegral l)) `mod` 2) /= 0)
 --Anotacion : La raiz siempre debe ser negra, esto porque si fuese roja rompería la invariante local (todo nodo rojo DEBE tener un padre negro)
-fromOrdListRBT xs = if ((truncate(logBase 2 (fromIntegral (length xs))) `mod` 2) /= 0) then makeBlack (fromOrdListRBT' Re xs)
+fromOrdListRBT xs = if ((truncate(logBase 2 (fromIntegral (length xs))) `mod` 2) /= 0) then (fromOrdListRBT' R xs)
                                                                                        else makeBlack (fromOrdListRBT' B xs)
 
 
