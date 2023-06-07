@@ -239,3 +239,29 @@ fromList' xs = let zs = map (\x-> Nod 1 x Em Em) xs
                    g ys = g (pares ys) 
                    in g zs
 
+data Arb = V | Hoja Int | Ndo Arb Arb deriving Show
+
+data Cmd = Lef | Rig deriving Show 
+
+selec [] arb = arb 
+selec [Lef] (Ndo l r) = l 
+selec [Rig] (Ndo l r) = r 
+selec (x:xs) arb@(Ndo l r) = let t = selec [x] arb
+                                 in selec xs t 
+enum V = [[]]
+enum (Hoja _) = [[]]
+enum (Ndo l V) = map (Lef:) (enum l) 
+enum (Ndo V r) = map (Rig:) (enum r) 
+enum (Ndo l r) = map (Lef:) (enum l) ++ map (Rig:) (enum r)
+
+
+balancedBST x 0 = H 
+balancedBST x n | even(n-1) = let m = div (n-1) 2
+                                  u = balancedBST x m 
+                                  in N u x u
+
+                | otherwise = let m = div (n-1) 2 
+                                  (t1,t2) = balancedBST' x m 
+                                  in N t1 x t2
+                                        where balancedBST' x m =(balancedBST x (m+1),balancedBST x m)
+                                   
