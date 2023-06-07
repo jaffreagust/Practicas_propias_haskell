@@ -267,15 +267,3 @@ balancedBST x n | even(n-1) = let m = div (n-1) 2
 
 
         
-minimun (H) = 0
-minimun (N H x r) = x 
-minimun (N l x r) = minimun l
-
-deleteBTS _ H = H
-deleteBTS x (N H y H) | x == y = H 
-deleteBTS x (N H y r) | x == y = r 
-deleteBTS x (N l y H) | x == y = l   
-deleteBTS x (N l y r) | x< y = N (deleteBTS x l) y r 
-                      | x> y = N l y (deleteBTS x r)  
-                      | x == y = let b =minimun r
-                                     in N l b (deleteBTS x r)
