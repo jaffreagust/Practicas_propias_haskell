@@ -150,13 +150,12 @@ ror (x:xs) n = ror (xs++[x]) (n-1)
 upto n m | n==m = [m]
          | otherwise = n: upto (n+1) m
 
-eco' 0 x = []
-eco' n x = [x] ++ eco' (n-1) x
+--Modelo superior--
+eco' _ _ [] = []
+eco' n 0 (x:xs) = eco' (n+1) (n+1) xs
+eco' n m xs = head(xs) : eco' n (m-1) xs
 
-eco'' n [] = []
-eco'' n (x:xs) = (eco' n x) ++ eco'' (n+1) xs
-
-eco xs = eco'' 1 xs
+eco xs = eco' 1 1 xs
 
 
 cambios xs = [u| (x,y) <- zip [0..] xs , (u,v) <- zip [0..] xs, u==x-1 && v /= y]
@@ -227,3 +226,16 @@ checkLHeap (Nod c x Em Em) = c==1
 checkLHeap (Nod c x l Em) = x<findMin(l) && c==1 && checkLHeap l 
 checkLHeap (Nod c x Em r) = x<findMin(r) && c == (rank r) +1 && checkLHeap r 
 checkLHeap (Nod c x l r) = x<findMin(l) && x<findMin(r) && c==(rank r) +1 && rank l >= rank r  &&checkLHeap l && checkLHeap r 
+
+
+
+fromList'  [] = Em
+fromList' xs = let zs = map (\x-> Nod 1 x Em Em) xs
+                   pares [] = []
+                   pares [x] = [x]
+                   pares (x:y:ys) = (merge x y) : pares ys
+                   g [] = Em
+                   g [x] = x 
+                   g ys = g (pares ys) 
+                   in g zs
+
