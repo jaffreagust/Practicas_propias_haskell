@@ -265,5 +265,79 @@ balancedBST x n | even(n-1) = let m = div (n-1) 2
                                   in N t1 x t2
                                         where balancedBST' x m =(balancedBST x (m+1),balancedBST x m)
 
+data Linea = Linea {
+        chain::[Char],
+        pos::Int
+}deriving Show
 
+vacia = (Linea "" 0)
+
+moverIzq (Linea chain pos) | (pos == 0) = Linea chain pos
+                           | otherwise = Linea chain (pos-1)
+
+moverDer (Linea chain pos) | (pos == length chain) = Linea chain pos
+                           | otherwise = Linea chain (pos+1)
+
+moverIni (Linea chain pos) = Linea chain 0
+moverFin (Linea chain pos) = Linea chain (length chain)
+
+insertar char (Linea chain pos) = Linea (ins char chain pos) (pos+1)
+
+ins char chain 0 = char:chain 
+ins char (x:chain) n = x: ins char chain (n-1)
+
+deletear (Linea chain pos) | (pos == 0)  = Linea chain pos
+                           | otherwise = Linea (bor chain pos) (pos -1)
+
+bor chain 0 = chain
+bor (x:chain) 1 = chain
+bor (x:chain) pos = x: bor chain (pos-1)
+
+
+data CList a = EmptyCL | CUnit a | Consnoc  a (CList a) a deriving Show
+
+
+headCL (CUnit a) = a 
+headCL (Consnoc x _ _) = x
+
+tailCL (CUnit _) = EmptyCL
+tailCL (Consnoc x EmptyCL y) = CUnit y 
+tailCL (Consnoc x list y) = Consnoc (headCL list) (tailCL list) y
+
+isEmptyCL (EmptyCL) = True
+isEmptyCL _ = False
+
+isCUnit (CUnit _) = True
+isCUnit _ = False
+
+
+reverseCL (EmptyCL) = EmptyCL
+reverseCL (CUnit x) = CUnit x 
+reverseCL (Consnoc x list y) = Consnoc y (reverseCL list) x
+
+borrarLast (EmptyCL) = EmptyCL
+borrarLast (CUnit _) = EmptyCL
+borrarLast (Consnoc a EmptyCL b) = CUnit a
+borrarLast (Consnoc a list b) = Consnoc a (borrarLast list) (headCL(reverseCL list))
+
+inist (EmptyCL) = [[EmptyCL]]
+inist (CUnit x) = [[EmptyCL],[CUnit x]]
+inist lista@(Consnoc a list b) = let m = borrarLast lista 
+                                     in  (inist m) ++ [[lista]]
+
+lasts (EmptyCL) = [[EmptyCL]]
+lasts (CUnit x) = [[EmptyCL], [CUnit x]]
+lasts t@(Consnoc x lista y) = lasts (tailCL t) ++ [[t]]
         
+minimun (H) = 0
+minimun (N H x r) = x 
+minimun (N l x r) = minimun l
+
+deleteBTS _ H = H
+deleteBTS x (N H y H) | x == y = H 
+deleteBTS x (N H y r) | x == y = r 
+deleteBTS x (N l y H) | x == y = l   
+deleteBTS x (N l y r) | x< y = N (deleteBTS x l) y r 
+                      | x> y = N l y (deleteBTS x r)  
+                      | x == y = let b =minimun r
+                                     in N l b (deleteBTS x r)
