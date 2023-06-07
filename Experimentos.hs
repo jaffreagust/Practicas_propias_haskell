@@ -5,13 +5,6 @@ type Rank = Int
 data Heap a= Em| Nod Rank a (Heap a) (Heap a) deriving (Show)
 
 
-checkLHeap Em = True
-checkLHeap (Nod _ _ Em Em ) = True
-checkLHeap (Nod _ a1 Em r@(Nod _ a2 l1 r1)) = a1<a2
-checkLHeap (Nod _ a1 l@(Nod _ a2 l1 r1) Em) = a1<a2 
-checkLHeap (Nod _ a1 l@(Nod rank1 a2 l1 r1) r@(Nod rank2 a3 l2 r2)) = a1<a2 && a1<a3 && rank1>= rank2 && checkLHeap l && checkLHeap r
-
-
 fromList [] = Em
 fromList xs = let hs = map (\x-> Nod 1 x Em Em) xs
                   pares [] = []
@@ -201,3 +194,36 @@ fung (a,b,c) = True
 funh (a,b,c ) x =  if x +10 == 20 then c else c
 funi (a,b,c) x = if a==b && b == c && sum(x,10) > 10 then a else b
             
+ 
+--METODO 1--
+
+minL (Nod _ x Em Em) = x 
+minL (Nod _ x Em r) = min x (minL r)
+minL (Nod _ x l Em) = min x (minL l)
+minL (Nod _ x l r) = min x (min (minL l) (minL r))
+
+
+--Agregue la condicion de que el rango del padre tiene que ser igual al rango del hijo derecho más 1, asi se evitan problemas en el rango
+checkLHeap' Em = True
+checkLHeap' (Nod c x Em Em) = c == 1
+checkLHeap' t@(Nod c x l Em) = let m = minL t
+                                   in x == m && checkLHeap' l && c == 1
+checkLHeap' t@(Nod c x Em r) = let m = minL t
+                                   in x == m && checkLHeap' r && c == (rank r)+1 
+checkLHeap' t@(Nod c x l r) = let m = minL t
+                                  lc = rank l
+                                  rc = rank r
+                                  in x == m && lc >= rc && checkLHeap' l && checkLHeap' r && c==rc+1
+
+
+
+--METODO 2--
+
+findMin Em = 0
+findMin (Nod _ x _ _) = x
+
+checkLHeap Em = True
+checkLHeap (Nod c x Em Em) = c==1
+checkLHeap (Nod c x l Em) = x<findMin(l) && c==1 && checkLHeap l 
+checkLHeap (Nod c x Em r) = x<findMin(r) && c == (rank r) +1 && checkLHeap r 
+checkLHeap (Nod c x l r) = x<findMin(l) && x<findMin(r) && c==(rank r) +1 && rank l >= rank r  &&checkLHeap l && checkLHeap r 
